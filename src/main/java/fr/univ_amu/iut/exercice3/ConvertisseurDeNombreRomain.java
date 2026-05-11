@@ -29,24 +29,58 @@ public class ConvertisseurDeNombreRomain {
   /**
    * Convertit une chaîne de chiffres romains en valeur entière.
    *
-   * @param chiffreRomain chaîne composée de symboles romains (par exemple {@code "XLIX"})
+   * @param nombreRomain chaîne composée de symboles romains (par exemple {@code "XLIX"})
    * @return la valeur entière correspondante
    * @throws IllegalArgumentException si la chaîne contient un symbole invalide ou une soustraction
    *     interdite
    */
-  public int enNombreArabe(String chiffreRomain) {
-    int total = 0;
-    // TODO exercice 3 : remplir total en parcourant la chaîne.
-    //
-    // Activez les tests un par un. Commencez par "I" = 1 (fake it en
-    // retournant 1 en dur), puis "II" = 2 et "III" = 3 (boucle de comptage
-    // d'occurrences de I), puis "V" = 5 (switch sur le symbole).
-    //
-    // Quand vous arrivez à "IV" = 4 : extrayez une méthode valeurDe(char)
-    // pour factoriser, puis ajoutez la logique de soustraction.
-    //
-    // Pour les exceptions : une soustraction est valide seulement pour
-    // I avant V/X, X avant L/C, C avant D/M. Tout le reste est invalide.
-    return total;
+  public int enNombreArabe(String nombreRomain) {
+    int valeur = enNombreArabe(nombreRomain.charAt(0));
+
+    for (int i = 1; i < nombreRomain.length(); i++) {
+      char chiffreRomainPrecedent = nombreRomain.charAt(i - 1);
+      char chiffreRomainCourant = nombreRomain.charAt(i);
+      if (estCasDeSoustraction(chiffreRomainPrecedent, chiffreRomainCourant)) {
+        if (!estCasDeSoustractionValide(chiffreRomainPrecedent, chiffreRomainCourant))
+          throw new IllegalArgumentException();
+        valeur -= 2 * enNombreArabe(chiffreRomainPrecedent);
+      }
+      valeur += enNombreArabe(chiffreRomainCourant);
+    }
+    return valeur;
+  }
+
+  private boolean estCasDeSoustractionValide(
+      char chiffreRomainPrecedent, char chiffreRomainCourant) {
+    return (chiffreRomainPrecedent == 'I' && chiffreRomainCourant == 'V')
+        || (chiffreRomainPrecedent == 'I' && chiffreRomainCourant == 'X')
+        || (chiffreRomainPrecedent == 'X' && chiffreRomainCourant == 'L')
+        || (chiffreRomainPrecedent == 'X' && chiffreRomainCourant == 'C')
+        || (chiffreRomainPrecedent == 'C' && chiffreRomainCourant == 'D')
+        || (chiffreRomainPrecedent == 'C' && chiffreRomainCourant == 'M');
+  }
+
+  private boolean estCasDeSoustraction(char chiffreRomainPrecedent, char chiffreRomainCourant) {
+    return enNombreArabe(chiffreRomainPrecedent) < enNombreArabe(chiffreRomainCourant);
+  }
+
+  private int enNombreArabe(char chiffreRomain) {
+    if (chiffreRomain == 'I') {
+      return 1;
+    }
+    if (chiffreRomain == 'V') {
+      return 5;
+    } else if (chiffreRomain == 'X') {
+      return 10;
+    } else if (chiffreRomain == 'L') {
+      return 50;
+    } else if (chiffreRomain == 'C') {
+      return 100;
+    } else if (chiffreRomain == 'D') {
+      return 500;
+    } else if (chiffreRomain == 'M') {
+      return 1000;
+    }
+    throw new IllegalArgumentException();
   }
 }
